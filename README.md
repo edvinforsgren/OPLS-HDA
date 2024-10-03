@@ -5,6 +5,7 @@ framework to create a decision tree, addressing multiclass classification challe
 providing intuitive visualization of inter-class relationships. To avoid overfitting and
 ensure reliable predictions, we use cross-validation during model building.
 
+Preprint available at: https://doi.org/10.1101/2024.09.23.614438 
 
 In ```simca_python_scripts```, the code to run OPLS-HDA in SIMCA 18.0 is available.
 
