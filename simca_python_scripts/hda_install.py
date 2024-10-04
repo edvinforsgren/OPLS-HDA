@@ -1,13 +1,10 @@
 import umpypkg as pkg
 
 packages = [
-    'numpy',
-    'pandas',
-    'scipy',
-    'matplotlib',
-    'scikit-learn',
-    'seaborn',
-    'tkinter'
+    'scipy==1.8.0',
+    'matplotlib==3.7.0',
+    'scikit-learn==1.3.0',
+    'seaborn==0.12.2',
 ]
 
 for package in packages:
