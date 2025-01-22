@@ -11,11 +11,11 @@ Authors:
 - Edvin Forsgren (edvin.forsgren@gmail.com)
 - Pär Jonsson (paer.jonsson@sartorius.com)
 
-Last edit: 2024-10-02
+Last edit: 2025-01-22
 
 MIT License
 
-Copyright (c) 2024 Edvin Forsgren, Pär Jonsson
+Copyright (c) 2025 Edvin Forsgren, Pär Jonsson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ class Auto_fit:
         elif AFoption=='choose':
             if AFoption2>max_ortho:
                 AFoption2=int(max_ortho)
-            comp=project.fit_model(modelNUM,numcomp=1, numorthX=AFoption2)
+            comp=project.fit_model(modelNUM,numcomp=1, numorthX=AFoption2-1)
 
 def one_vs_one_calc(AFoption, scale_option, dataset_name, excl_from_training_set, train_df, class_col, excl_test_data, n_components=None):
     project = umetrics.SimcaApp.get_active_project()
@@ -634,8 +634,8 @@ def plot_cv_conf_matrix(bin_models, dataset_name, linked_data, link_option, excl
             "Class CV": pred_class,
             "Predicted CV": yhat_name,
             "Correct prediction CV": ["yes" if c == pc else "no" for c, pc in zip(pred_class, yhat_name)],
-            "Max DModXPS CV": np.squeeze(DMOD2),
-            "Max DModXPS - Split # CV": np.squeeze(model_number)
+            "Max DModX CV": np.squeeze(DMOD2),
+            "Max DModX - Split # CV": np.squeeze(model_number)
             }
     df = pd.DataFrame(data)
     df.set_index("Primary ID", inplace=True)
@@ -831,8 +831,8 @@ def plot_test_conf_matrix(bin_models, dataset_name, train_dataset_name, linked_d
             "Class PS": pred_class,
             "Predicted PS": yhat_name,
             "Correct prediction PS": ["yes" if c == pc else "no" if pc in pred_class else "N/A" for c, pc in zip(pred_class, yhat_name)],
-            "Max DModPS PS": np.squeeze(DMOD2),
-            "Max DModXPS - Split # PS": np.squeeze(model_number)
+            "Max DModX PS": np.squeeze(DMOD2),
+            "Max DModX - Split # PS": np.squeeze(model_number)
             }
     df = pd.DataFrame(data)
     df.set_index("Primary ID", inplace=True)
