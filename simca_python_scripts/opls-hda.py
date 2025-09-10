@@ -8,10 +8,10 @@ providing intuitive visualization of inter-class relationships. To avoid overfit
 ensure reliable predictions, we use cross-validation during model building.
 
 Authors:
-- Edvin Forsgren (edvin.forsgren@gmail.com)
+- Edvin Forsgren (edvin.forsgren@sartorius.com)
 - Pär Jonsson (paer.jonsson@sartorius.com)
 
-Last edit: 2025-01-22
+Last edit: 2025-09-10
 
 MIT License
 
@@ -912,10 +912,10 @@ def plot_volcano(model, ax, fig, df, class_col):
     project = umetrics.SimcaApp.get_active_project()
     p_vector = calc_p_vector(project=project, model=model)
     fc_vector = calc_fc_vector(project=project, model=model)
+    builder = project.data_builder()
+    data=builder.create("p", model=model, comp=1)
+    val_ids=data.get_value_ids().get_names()
 
-    n_xvar = len(p_vector)
-    val_ids = project.data_builder().create("VarDS", model=model).series_names()[0:n_xvar]
-    val_ids = [val_id.split(f"M{model}.")[1] for val_id in val_ids]
     df = pd.DataFrame({'Var': val_ids, 'P.Val': p_vector, 'FC':fc_vector})
 
     marker_size = 50
@@ -1029,9 +1029,10 @@ def plot_volcano_log2(model, ax, fig, df, class_col):
     p_vector = calc_p_vector(project=project, model=model)
     fc_vector = calc_fc_log2_vector(project=project, model=model)
 
-    n_xvar = len(p_vector)
-    val_ids = project.data_builder().create("VarDS", model=model).series_names()[0:n_xvar]
-    val_ids = [val_id.split(f"M{model}.")[1] for val_id in val_ids]
+    builder = project.data_builder()
+    data=builder.create("p", model=model, comp=1)
+    val_ids=data.get_value_ids().get_names()
+    
     df = pd.DataFrame({'Var': val_ids, 'P.Val': p_vector, 'FC':fc_vector})
 
     marker_size = 50
@@ -1146,10 +1147,9 @@ def calc_fc_log2_vector(project, model):
     FC = []
     for i in range(0,X.shape[0]):
         x=X[i,:]
-        m0=np.mean(pow(2,x[np.where((Y[0,:])==np.min(Y[0,:]))]))
-        m1=np.mean(pow(2,x[np.where((Y[0,:])==np.max(Y[0,:]))]))
-        # WLp[0][i]=p
-        # if  m1/m0>0:
+        m0=np.nanmean(pow(2,x[np.where((Y[0,:])==np.min(Y[0,:]))]))
+        m1=np.nanmean(pow(2,x[np.where((Y[0,:])==np.max(Y[0,:]))]))
+
         if min([m1, m0])>0:
             if C[0,0]>0:
                 FC.append(m1/m0)
@@ -1168,10 +1168,8 @@ def calc_fc_vector(project, model):
     FC = []
     for i in range(0,X.shape[0]):
         x=X[i,:]
-        m0=np.mean(x[np.where((Y[0,:])==np.min(Y[0,:]))])
-        m1=np.mean(x[np.where((Y[0,:])==np.max(Y[0,:]))])
-        # WLp[0][i]=p
-        # if  m1/m0>0:
+        m0=np.nanmean(x[np.where((Y[0,:])==np.min(Y[0,:]))])
+        m1=np.nanmean(x[np.where((Y[0,:])==np.max(Y[0,:]))])
         if min([m1, m0])>0:
             if C[0,0]>0:
                 FC.append(m1/m0)
@@ -1214,10 +1212,14 @@ def calc_p_vector(project, model):
         ydiff=yc-yhat
         rsd=np.sqrt(np.sum(ydiff**2)/(z.shape[0]-z.shape[1]))
         se=(1/np.sqrt(np.diag(np.matmul(z.T, z)))).dot(rsd)
-        T=B[-1]/se[-1]
-        p=2*t.cdf(-abs(T),z.shape[0]-z.shape[1])
-        if p<1.175494351e-38:
-            p=1.175494351e-38
+        
+        if se[-1]>0:
+            T=B[-1]/se[-1]
+            p=2*t.cdf(-abs(T),z.shape[0]-z.shape[1])
+            if p<1.175494351e-38:
+                p=1.175494351e-38
+        else:
+            p=np.nan
         WLp.append(p)
     return WLp
 
